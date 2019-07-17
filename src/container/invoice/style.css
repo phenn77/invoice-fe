@@ -1,0 +1,18 @@
+.invoice-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 80px;
+}
+
+.invoice-fieldset {
+    width: 70%;
+}
+
+.invoice-detail {
+    width: 100%;
+    /*background-color: yellow;*/
+}
+
+.invoice-detail td {
+    border: 1px solid black;
+}
