@@ -1,12 +1,10 @@
-/* Container to set the width */
 body {
-  background-color: lightgray;
+  background: linear-gradient(to right, #f0e1b9ff 50%, #f3db74ff 50%);
 }
 
 .container {
   max-width: 1200px;
   margin: auto;
-  background-color: white;
 }
 
 .text-left {
@@ -25,7 +23,4 @@ body {
   height: 100vh;
 }
 
-/*#f2f6f5*/
-/*#C8DAD3*/
-/*#93B5B3*/
-/*#63707E*/
+/*White (#FCF6F5FF), Vanilla Custard (#F0E1B9FF), Goldfinch (#F3DB74FF) and Scarlet Sage (#A13941FF)*/

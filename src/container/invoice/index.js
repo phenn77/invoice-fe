@@ -149,7 +149,19 @@ class Invoice extends Component {
 
                 <div className="table-container">
                     <table className="invoice-detail">
+                        <thead>
+                        <tr>
+                            <th style={{width: 40}}>No</th>
+                            <th className="text-left">Name</th>
+                            <th className="text-center" style={{width: 70}}>Action</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
                         {detailsRender}
+                        </tbody>
+
+                        <tfoot>
                         <tr>
                             <td colSpan={2}>Total</td>
                             <td>{total}</td>
@@ -179,6 +191,7 @@ class Invoice extends Component {
                             <td colSpan={2}>Grand Total</td>
                             <td>{grandTotal}</td>
                         </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
