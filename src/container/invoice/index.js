@@ -7,6 +7,9 @@ class Invoice extends Component {
 
         this.state = {
             participantList: [],
+            invoiceName: '',
+            inputInvoiceName: '',
+            viewName: false,
             details: [],
             inputName: '',
             inputPrice: 0,
@@ -18,10 +21,21 @@ class Invoice extends Component {
             eachAmount: []
         };
 
+        this.submitInvoiceName = this.submitInvoiceName.bind(this);
+        this.handleInputInvoiceName = this.handleInputInvoiceName.bind(this);
+
         this.submitForm = this.submitForm.bind(this);
         this.handleInputName = this.handleInputName.bind(this);
         this.handleInputPrice = this.handleInputPrice.bind(this);
         this.handleInputServiceCharge = this.handleInputServiceCharge.bind(this);
+    }
+
+    handleInputInvoiceName(e) {
+        const invName = e.target.value;
+
+        this.setState({
+            inputInvoiceName: invName
+        });
     }
 
     handleInputName(e) {
@@ -71,6 +85,19 @@ class Invoice extends Component {
         });
     }
 
+    submitInvoiceName(e) {
+        e.preventDefault();
+
+        const {inputInvoiceName} = this.state;
+
+        if(inputInvoiceName !== '') {
+            this.setState({
+                invoiceName: inputInvoiceName,
+                viewName: true,
+            });
+        }
+    }
+
     submitForm(e) {
         e.preventDefault();
 
@@ -96,23 +123,24 @@ class Invoice extends Component {
     }
 
     render() {
-        const {inputName, inputPrice, details, total, serviceCharge, inputService, tax, grandTotal} = this.state;
+        const {inputInvoiceName, inputName, inputPrice, details, total, serviceCharge, inputService, tax, grandTotal} = this.state;
 
         const detailsRender = details.map((value, index) => {
             return (
                 <tr>
-                    <td style={{width: 30}}>
+                    <td className="text-center">
                         {index + 1}
                     </td>
                     <td>
                         {value.name}
                     </td>
-                    <td>
+                    <td className="text-right">
                         {value.price}
                     </td>
-                    <td style={{width: 50}}>
+                    <td>
                         <button
                             type="button"
+                            className="text-center"
                             onClick={e => this.deleteDetail(index, value.price)}
                         >
                             Delete
@@ -124,6 +152,15 @@ class Invoice extends Component {
 
         return (
             <div className="content invoice-container">
+
+                <form onSubmit={this.submitInvoiceName}>
+                    <input
+                        type="text"
+                        onChange={this.handleInputInvoiceName}
+                        value={inputInvoiceName}
+                        placeholder="Input Invoice Name"
+                    />
+                </form>
 
                 <fieldset className="form-fieldset">
                     <legend>Detail</legend>
@@ -151,8 +188,9 @@ class Invoice extends Component {
                     <table className="invoice-detail">
                         <thead>
                         <tr>
-                            <th style={{width: 40}}>No</th>
+                            <th style={{width: 40}} className="text-center">No</th>
                             <th className="text-left">Name</th>
+                            <th className="text-right"> Price </th>
                             <th className="text-center" style={{width: 70}}>Action</th>
                         </tr>
                         </thead>
@@ -164,11 +202,11 @@ class Invoice extends Component {
                         <tfoot>
                         <tr>
                             <td colSpan={2}>Total</td>
-                            <td>{total}</td>
+                            <td className="text-right">{total}</td>
                         </tr>
                         <tr>
                             <td>Service</td>
-                            <td>
+                            <td className="text-right">
                                 <form>
                                     <input
                                         type="number"
@@ -180,16 +218,16 @@ class Invoice extends Component {
                                     />
                                 </form>
                             </td>
-                            <td>{serviceCharge}</td>
+                            <td className="text-right">{serviceCharge}</td>
                         </tr>
                         <tr>
                             <td>Tax</td>
-                            <td>10%</td>
-                            <td>{tax}</td>
+                            <td className="text-right">10%</td>
+                            <td className="text-right">{tax}</td>
                         </tr>
                         <tr>
                             <td colSpan={2}>Grand Total</td>
-                            <td>{grandTotal}</td>
+                            <td className="text-right">{grandTotal}</td>
                         </tr>
                         </tfoot>
                     </table>
