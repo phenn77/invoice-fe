@@ -1,18 +1,23 @@
 .invoice-container {
-    display: flex;
+    display: block;
     justify-content: center;
-    margin-top: 80px;
-}
-
-.invoice-fieldset {
-    width: 70%;
+    background-color: #93B5B3;
 }
 
 .invoice-detail {
     width: 100%;
-    /*background-color: yellow;*/
+    border-collapse: collapse;
 }
 
 .invoice-detail td {
     border: 1px solid black;
+}
+
+.form-fieldset {
+    width: 30%;
+}
+
+.table-container {
+    padding-left: 100px;
+    padding-right: 100px;
 }

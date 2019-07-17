@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import Participant from "../../participants";
 import './style.css';
 
 class Invoice extends Component {
@@ -124,26 +123,31 @@ class Invoice extends Component {
         });
 
         return (
-            <div className="invoice-container">
-                <form onSubmit={this.submitForm}>
-                    <input
-                        type="text"
-                        onChange={this.handleInputName}
-                        value={inputName}
-                        placeholder="Input Name"
-                    />
+            <div className="content invoice-container">
 
-                    <input
-                        type="number"
-                        onChange={this.handleInputPrice}
-                        value={inputPrice}
-                        placeholder="Input Price"
-                    />
+                <fieldset className="form-fieldset">
+                    <legend>Detail</legend>
 
-                    <button type="submit"> Add</button>
-                </form>
+                    <form onSubmit={this.submitForm}>
+                        <input
+                            type="text"
+                            onChange={this.handleInputName}
+                            value={inputName}
+                            placeholder="Input Name"
+                        />
 
-                <div>
+                        <input
+                            type="number"
+                            onChange={this.handleInputPrice}
+                            value={inputPrice}
+                            placeholder="Input Price"
+                        />
+
+                        <button type="submit"> Add</button>
+                    </form>
+                </fieldset>
+
+                <div className="table-container">
                     <table className="invoice-detail">
                         {detailsRender}
                         <tr>
