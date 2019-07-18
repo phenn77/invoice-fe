@@ -20,6 +20,7 @@
     width: 30%;
     text-align: center;
     margin: auto auto 50px auto;
+    font-weight: bold;
 }
 
 .table-container {
@@ -31,4 +32,18 @@
     letter-spacing: 10px;
     text-align: center;
     margin-top: 0;
+    margin-bottom: 0;
+    
+}
+
+.input-invoice-name {
+    font-size: 40px;
+    background-color: transparent;
+    border: none;
+}
+
+.invoice-input-form {
+    padding-top: 50px;
+    padding-bottom: 40px;
+    text-align: center;
 }

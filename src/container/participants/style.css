@@ -2,6 +2,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-top: 40px;
 }
 
 .heading {
@@ -11,6 +12,9 @@
 .inputContent {
     background-color: #fcf6f5ff;
     border-radius: 20px;
+
+    border: 2px solid #a13941ff;
+    animation: blink .5s step-end infinite alternate;
 }
 
 .inputForm > input {
@@ -29,6 +33,12 @@
     background-color: #a13941ff;
     border-radius: 20px;
     padding: 10px;
+
+    transition: all .3s; /*animate*/
+}
+
+.tableContent:hover {
+    transform: scale(1.1);
 }
 
 .participantTable {
@@ -42,3 +52,8 @@
     text-align: center;
     bottom: 0;
 }
+
+@keyframes blink {
+    50% { border-color: #fcf6f5ff; }
+}
+

@@ -7,7 +7,7 @@ import Home from "./home";
 function App() {
     return (
         <div className="container">
-            <Home/>
+            {/*<Home/>*/}
             <Participant/>
             <Invoice/>
         </div>

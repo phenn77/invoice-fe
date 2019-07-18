@@ -11,7 +11,8 @@ class Invoice extends Component {
             participantList: [],
             invoiceName: '',
             inputInvoiceName: '',
-            viewName: false,
+            viewName: 'none', //to show h1 of invoice name
+            inputNameForm: 'block', //form to show input invoice name
             details: [],
             inputName: '',
             inputPrice: 0,
@@ -25,6 +26,7 @@ class Invoice extends Component {
 
         this.submitInvoiceName = this.submitInvoiceName.bind(this);
         this.handleInputInvoiceName = this.handleInputInvoiceName.bind(this);
+        this.editName = this.editName.bind(this);
 
         this.submitForm = this.submitForm.bind(this);
         this.handleInputName = this.handleInputName.bind(this);
@@ -111,10 +113,19 @@ class Invoice extends Component {
         if (inputInvoiceName !== '') {
             this.setState({
                 invoiceName: inputInvoiceName,
-                viewName: true,
-                inputNameForm: false
+                viewName: 'block',
+                inputNameForm: 'none'
             });
         }
+    }
+
+    editName(e) {
+        e.preventDefault();
+
+        this.setState({
+            viewName: 'none',
+            inputNameForm: 'block'
+        });
     }
 
     submitForm(e) {
@@ -145,7 +156,7 @@ class Invoice extends Component {
         const {
             participantList, inputInvoiceName, inputName, inputPrice,
             details, total, serviceCharge, inputService, tax, grandTotal,
-            invoiceName
+            invoiceName, viewName, inputNameForm
         } = this.state;
 
         const participantName = participantList.map((value) => {
@@ -198,17 +209,21 @@ class Invoice extends Component {
 
         return (
             <div className="content invoice-container">
-                <div>
-                    <form onSubmit={this.submitInvoiceName}>
+                <div className="invoice-input-form">
+                    <form onSubmit={this.submitInvoiceName} style={{display: inputNameForm}}>
                         <input
                             type="text"
                             onChange={this.handleInputInvoiceName}
                             value={inputInvoiceName}
                             placeholder="Input Invoice Name"
+                            className="input-invoice-name"
                         />
                     </form>
 
-                    <h1 className="title">
+                    <h1 className="title"
+                        style={{display: viewName}}
+                        onClick={e => this.editName(e)}
+                    >
                         {invoiceName}
                     </h1>
                 </div>
@@ -221,7 +236,7 @@ class Invoice extends Component {
                             type="text"
                             onChange={this.handleInputName}
                             value={inputName}
-                            placeholder="Input Name"
+                            placeholder="Input Detail"
                         />
 
                         <input
@@ -286,6 +301,15 @@ class Invoice extends Component {
                         </tr>
                         </tfoot>
                     </table>
+                </div>
+
+                <div className="text-center">
+                    <button>
+                        Save
+                    </button>
+                    <button>
+                        Reset
+                    </button>
                 </div>
             </div>
         );
