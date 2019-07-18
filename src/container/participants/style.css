@@ -1,6 +1,6 @@
 .participantContent {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
 }
 
@@ -19,7 +19,6 @@
 }
 
 .inputForm {
-    border: 1px solid black;
     padding: 10px;
     border-radius: 20px;
 }
@@ -27,7 +26,6 @@
 .tableContent {
     width: 30%;
     height: 350px;
-    border: 1px solid black;
     background-color: #a13941ff;
     border-radius: 20px;
     padding: 10px;

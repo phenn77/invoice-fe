@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import './style.css';
 
+import axios from 'axios';
+
 class Invoice extends Component {
     constructor(props) {
         super(props);
@@ -28,6 +30,22 @@ class Invoice extends Component {
         this.handleInputName = this.handleInputName.bind(this);
         this.handleInputPrice = this.handleInputPrice.bind(this);
         this.handleInputServiceCharge = this.handleInputServiceCharge.bind(this);
+    }
+
+    componentDidMount() {
+        const url = 'http://localhost:7777/participants';
+
+        axios.get(url)
+            .then(response => {
+                const data = response.data;
+
+                this.setState({
+                    participantList: data
+                })
+            })
+            .catch(error => {
+                console.log(error);
+            })
     }
 
     handleInputInvoiceName(e) {
@@ -90,10 +108,11 @@ class Invoice extends Component {
 
         const {inputInvoiceName} = this.state;
 
-        if(inputInvoiceName !== '') {
+        if (inputInvoiceName !== '') {
             this.setState({
                 invoiceName: inputInvoiceName,
                 viewName: true,
+                inputNameForm: false
             });
         }
     }
@@ -123,7 +142,32 @@ class Invoice extends Component {
     }
 
     render() {
-        const {inputInvoiceName, inputName, inputPrice, details, total, serviceCharge, inputService, tax, grandTotal} = this.state;
+        const {
+            participantList, inputInvoiceName, inputName, inputPrice,
+            details, total, serviceCharge, inputService, tax, grandTotal,
+            invoiceName
+        } = this.state;
+
+        const participantName = participantList.map((value) => {
+            return (
+                <th>
+                    {value.name}
+                </th>
+            );
+        });
+
+        const participantInput = participantList.map((dt) => {
+            return (
+                <td>
+                    <form>
+                        <input
+                            type="checkbox"
+                            value={dt.id}
+                        />
+                    </form>
+                </td>
+            );
+        });
 
         const detailsRender = details.map((value, index) => {
             return (
@@ -131,16 +175,18 @@ class Invoice extends Component {
                     <td className="text-center">
                         {index + 1}
                     </td>
-                    <td>
+                    <td className="padLeft">
                         {value.name}
                     </td>
-                    <td className="text-right">
+                    <td className="text-right padRight number-spacing">
                         {value.price}
                     </td>
-                    <td>
+
+                    {participantInput}
+
+                    <td className="text-center">
                         <button
                             type="button"
-                            className="text-center"
                             onClick={e => this.deleteDetail(index, value.price)}
                         >
                             Delete
@@ -152,15 +198,20 @@ class Invoice extends Component {
 
         return (
             <div className="content invoice-container">
+                <div>
+                    <form onSubmit={this.submitInvoiceName}>
+                        <input
+                            type="text"
+                            onChange={this.handleInputInvoiceName}
+                            value={inputInvoiceName}
+                            placeholder="Input Invoice Name"
+                        />
+                    </form>
 
-                <form onSubmit={this.submitInvoiceName}>
-                    <input
-                        type="text"
-                        onChange={this.handleInputInvoiceName}
-                        value={inputInvoiceName}
-                        placeholder="Input Invoice Name"
-                    />
-                </form>
+                    <h1 className="title">
+                        {invoiceName}
+                    </h1>
+                </div>
 
                 <fieldset className="form-fieldset">
                     <legend>Detail</legend>
@@ -188,10 +239,14 @@ class Invoice extends Component {
                     <table className="invoice-detail">
                         <thead>
                         <tr>
-                            <th style={{width: 40}} className="text-center">No</th>
-                            <th className="text-left">Name</th>
-                            <th className="text-right"> Price </th>
-                            <th className="text-center" style={{width: 70}}>Action</th>
+                            <th style={{width: 40}} className="text-center" rowSpan={2}>No</th>
+                            <th className="text-left padLeft" rowSpan={2}>Name</th>
+                            <th className="text-right padRight" rowSpan={2}> Price</th>
+                            <th colSpan={participantList.length}> Participants</th>
+                            <th className="text-center" style={{width: 70}} rowSpan={2}>Action</th>
+                        </tr>
+                        <tr>
+                            {participantName}
                         </tr>
                         </thead>
 
@@ -201,11 +256,11 @@ class Invoice extends Component {
 
                         <tfoot>
                         <tr>
-                            <td colSpan={2}>Total</td>
-                            <td className="text-right">{total}</td>
+                            <td colSpan={2} className="padLeft">Total</td>
+                            <td className="text-right padRight number-spacing">{total}</td>
                         </tr>
                         <tr>
-                            <td>Service</td>
+                            <td className="padLeft">Service</td>
                             <td className="text-right">
                                 <form>
                                     <input
@@ -218,16 +273,16 @@ class Invoice extends Component {
                                     />
                                 </form>
                             </td>
-                            <td className="text-right">{serviceCharge}</td>
+                            <td className="text-right padRight number-spacing">{serviceCharge}</td>
                         </tr>
                         <tr>
-                            <td>Tax</td>
-                            <td className="text-right">10%</td>
-                            <td className="text-right">{tax}</td>
+                            <td className="padLeft">Tax</td>
+                            <td className="text-right padRight number-spacing">10%</td>
+                            <td className="text-right padRight number-spacing">{tax}</td>
                         </tr>
                         <tr>
-                            <td colSpan={2}>Grand Total</td>
-                            <td className="text-right">{grandTotal}</td>
+                            <td colSpan={2} className="padLeft">Grand Total</td>
+                            <td className="text-right padRight number-spacing">{grandTotal}</td>
                         </tr>
                         </tfoot>
                     </table>

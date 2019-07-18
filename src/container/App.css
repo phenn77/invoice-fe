@@ -23,4 +23,16 @@ body {
   height: 100vh;
 }
 
+.padLeft {
+  padding-left: 10px;
+}
+
+.padRight {
+  padding-right: 10px;
+}
+
+.number-spacing {
+  letter-spacing: 5px;
+}
+
 /*White (#FCF6F5FF), Vanilla Custard (#F0E1B9FF), Goldfinch (#F3DB74FF) and Scarlet Sage (#A13941FF)*/

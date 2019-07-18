@@ -8,15 +8,27 @@
     border-collapse: collapse;
 }
 
-.invoice-detail td {
+.invoice-detail td, .invoice-detail th {
     border: 1px solid black;
+}
+
+.invoice-detail tbody {
+    min-height: 100px;
 }
 
 .form-fieldset {
     width: 30%;
+    text-align: center;
+    margin: auto auto 50px auto;
 }
 
 .table-container {
-    padding-left: 100px;
-    padding-right: 100px;
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+.title {
+    letter-spacing: 10px;
+    text-align: center;
+    margin-top: 0;
 }

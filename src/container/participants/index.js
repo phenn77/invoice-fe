@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './style.css';
 import axios from 'axios';
+import Invoice from "../invoice";
 
 class Participant extends Component {
     constructor(props) {
@@ -15,6 +16,8 @@ class Participant extends Component {
         this.handleInputName = this.handleInputName.bind(this);
         this.addParticipant = this.addParticipant.bind(this);
         this.delParticipant = this.delParticipant.bind(this);
+
+        this.submitParticipant = this.submitParticipant.bind(this);
     }
 
     handleInputName(e) {
@@ -75,6 +78,17 @@ class Participant extends Component {
         })
     }
 
+    /* Not done */
+    submitParticipant(e) {
+        e.preventDefault();
+
+        const {participantList} = this.state;
+console.log(participantList);
+        return (
+            <Invoice participants={participantList}/>
+        )
+    }
+
     render() {
         const {participantList, inputName, buttonStatus} = this.state;
 
@@ -101,39 +115,42 @@ class Participant extends Component {
         });
 
         return (
-            <div className="content participantContent">
+            <div className="content">
                 <h2 className="text-center">
                     PARTICIPANTS
                 </h2>
-                <div className="inputContent">
-                    <form onSubmit={this.addParticipant} className="inputForm">
-                        <input
-                            type="text"
-                            onChange={this.handleInputName}
-                            value={inputName}
-                            placeholder="Input Name"
-                        />
 
-                        <button type="submit" disabled={buttonStatus}> Add</button>
-                    </form>
-                </div>
+                <div className="participantContent">
+                    <div className="inputContent">
+                        <form onSubmit={this.addParticipant} className="inputForm">
+                            <input
+                                type="text"
+                                onChange={this.handleInputName}
+                                value={inputName}
+                                placeholder="Input Name"
+                            />
 
-                <div className="tableContent">
-                    <table className="participantTable">
-                        <thead>
-                        <th style={{width: 40}}>No</th>
-                        <th className="text-left">Name</th>
-                        <th className="text-center" style={{width: 70}}>Action</th>
-                        </thead>
-                        <tbody>
-                        {renderList}
-                        </tbody>
-                    </table>
+                            <button type="submit" disabled={buttonStatus}> Add</button>
+                        </form>
+                    </div>
 
-                    <div className="done-btn">
-                        <button>
-                            Done
-                        </button>
+                    <div className="tableContent">
+                        <table className="participantTable">
+                            <thead>
+                            <th style={{width: 40}}>No</th>
+                            <th className="text-left">Name</th>
+                            <th className="text-center" style={{width: 70}}>Action</th>
+                            </thead>
+                            <tbody>
+                            {renderList}
+                            </tbody>
+                        </table>
+
+                        <div className="done-btn">
+                            <button onClick={e => this.submitParticipant(e)}>
+                                Done
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
