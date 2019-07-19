@@ -32,6 +32,12 @@ class Invoice extends Component {
         this.handleInputName = this.handleInputName.bind(this);
         this.handleInputPrice = this.handleInputPrice.bind(this);
         this.handleInputServiceCharge = this.handleInputServiceCharge.bind(this);
+
+        this.resetData = this.resetData.bind(this);
+    }
+
+    formatNumber (num) {
+        return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
     }
 
     componentDidMount() {
@@ -152,6 +158,18 @@ class Invoice extends Component {
         }
     }
 
+    resetData(e) {
+        e.preventDefault();
+
+        this.setState({
+            total: 0,
+            serviceCharge: 0,
+            tax: 0,
+            grandTotal: 0,
+            details: []
+        })
+    }
+
     render() {
         const {
             participantList, inputInvoiceName, inputName, inputPrice,
@@ -190,7 +208,7 @@ class Invoice extends Component {
                         {value.name}
                     </td>
                     <td className="text-right padRight number-spacing">
-                        {value.price}
+                        {this.formatNumber(value.price)}
                     </td>
 
                     {participantInput}
@@ -272,7 +290,7 @@ class Invoice extends Component {
                         <tfoot>
                         <tr>
                             <td colSpan={2} className="padLeft">Total</td>
-                            <td className="text-right padRight number-spacing">{total}</td>
+                            <td className="text-right padRight number-spacing">{this.formatNumber(total)}</td>
                         </tr>
                         <tr>
                             <td className="padLeft">Service</td>
@@ -288,16 +306,16 @@ class Invoice extends Component {
                                     />
                                 </form>
                             </td>
-                            <td className="text-right padRight number-spacing">{serviceCharge}</td>
+                            <td className="text-right padRight number-spacing">{this.formatNumber(serviceCharge)}</td>
                         </tr>
                         <tr>
                             <td className="padLeft">Tax</td>
                             <td className="text-right padRight number-spacing">10%</td>
-                            <td className="text-right padRight number-spacing">{tax}</td>
+                            <td className="text-right padRight number-spacing">{this.formatNumber(tax)}</td>
                         </tr>
                         <tr>
                             <td colSpan={2} className="padLeft">Grand Total</td>
-                            <td className="text-right padRight number-spacing">{grandTotal}</td>
+                            <td className="text-right padRight number-spacing">{this.formatNumber(grandTotal)}</td>
                         </tr>
                         </tfoot>
                     </table>
@@ -307,7 +325,7 @@ class Invoice extends Component {
                     <button>
                         Save
                     </button>
-                    <button>
+                    <button onClick={e => this.resetData(e)}>
                         Reset
                     </button>
                 </div>

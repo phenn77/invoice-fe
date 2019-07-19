@@ -16,6 +16,8 @@ body {
     font-size: 20px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+
+    letter-spacing: 2px;
 }
 
 code {

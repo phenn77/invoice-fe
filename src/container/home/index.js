@@ -7,9 +7,12 @@ class Home extends Component {
     }
 
     render() {
-        return(
+        const {changePage} = this.props;
+        return (
             <div className="content home-container">
-
+                <button onClick={() => changePage('participant')}>
+                    Get Started
+                </button>
             </div>
         );
     }

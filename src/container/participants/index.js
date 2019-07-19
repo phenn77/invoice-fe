@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import './style.css';
 import axios from 'axios';
-import Invoice from "../invoice";
 
 class Participant extends Component {
     constructor(props) {
@@ -10,27 +9,26 @@ class Participant extends Component {
         this.state = {
             participantList: [],
             inputName: '',
-            buttonStatus: true
+            errors: {
+                inputName: '',
+            }
         };
 
         this.handleInputName = this.handleInputName.bind(this);
         this.addParticipant = this.addParticipant.bind(this);
         this.delParticipant = this.delParticipant.bind(this);
-
-        this.submitParticipant = this.submitParticipant.bind(this);
     }
 
     handleInputName(e) {
         const name = e.target.value;
 
-        if (name === '') {
+        if (name !== '') {
             this.setState({
-                buttonStatus: true
+                inputName: name,
             })
         } else {
             this.setState({
                 inputName: name,
-                buttonStatus: false
             })
         }
     }
@@ -39,23 +37,38 @@ class Participant extends Component {
         e.preventDefault();
 
         const url = 'http://localhost:7777/participants/create';
-        const self = this;
-        const {participantList} = self.state;
+        const {participantList} = this.state;
 
         axios.post(url, {
             name: this.state.inputName
-        }).then(function (response) {
+        }).then((response) => {
             const data = response.data;
+
+            // const {message} = data;
+            //
+            // if (message.length > 0) {
+            //     this.setState({
+            //         errors: {
+            //             inputName: message
+            //         }
+            //     });
+            //     return;
+            // }
 
             const newParticipantList = participantList;
             newParticipantList.push(data);
 
-            self.setState({
+            this.setState({
                 inputName: '',
-                participantList: newParticipantList
+                participantList: newParticipantList,
             })
-        }).catch(function (error) {
+        }).catch((error) => {
             console.log(error);
+            this.setState({
+                errors: {
+                    inputName: "Unexpected Error"
+                }
+            })
         });
     }
 
@@ -75,22 +88,22 @@ class Participant extends Component {
                 });
             }).catch(function (error) {
             console.log(error);
+            this.setState({
+                errors: {
+                    inputName: error
+                }
+            })
         })
     }
 
-    /* Not done */
-    submitParticipant(e) {
-        e.preventDefault();
-
-        const {participantList} = this.state;
-console.log(participantList);
-        return (
-            <Invoice participants={participantList}/>
-        )
-    }
-
     render() {
-        const {participantList, inputName, buttonStatus} = this.state;
+        const {participantList, inputName, errors} = this.state;
+        console.log(participantList.length);
+
+        const {
+            changePage, //to change page
+            data //send partipant list to invoice from app.js}
+        } = this.props;
 
         const renderList = participantList.map((value, index) => {
             return (
@@ -116,13 +129,13 @@ console.log(participantList);
 
         return (
             <div className="content">
-                <h2 className="text-center">
+                <h2 className="heading">
                     PARTICIPANTS
                 </h2>
 
                 <div className="participantContent">
                     <div className="inputContent">
-                        <form onSubmit={this.addParticipant} className="inputForm">
+                        <form onSubmit={this.addParticipant} className="inputForm" style={{position: 'relative'}}>
                             <input
                                 type="text"
                                 onChange={this.handleInputName}
@@ -130,24 +143,39 @@ console.log(participantList);
                                 placeholder="Input Name"
                             />
 
-                            <button type="submit" disabled={buttonStatus}> Add</button>
+                            {errors.inputName.length > 0 &&
+                            <div className="participantMessage">
+                                {errors.inputName}
+                            </div>}
+
+                            <button type="submit"> Add</button>
                         </form>
                     </div>
 
                     <div className="tableContent">
-                        <table className="participantTable">
-                            <thead>
-                            <th style={{width: 40}}>No</th>
-                            <th className="text-left">Name</th>
-                            <th className="text-center" style={{width: 70}}>Action</th>
-                            </thead>
-                            <tbody>
-                            {renderList}
-                            </tbody>
-                        </table>
+                        <div className="setOverflow">
+                            <table className="participantTable">
+                                <thead>
+                                <th style={{width: 40}}>No</th>
+                                <th className="text-left">Name</th>
+                                <th className="text-center" style={{width: 70}}>Action</th>
+                                </thead>
+                                <tbody>
+                                {renderList}
+                                </tbody>
+                            </table>
+                        </div>
 
                         <div className="done-btn">
-                            <button onClick={e => this.submitParticipant(e)}>
+                            <button
+                                onClick={() => {
+                                    changePage("invoice");
+                                    data(participantList);
+                                }}
+                                style={{
+                                    disabled: participantList.length < 2 ? 'disabled' : null
+                                }}
+                            >
                                 Done
                             </button>
                         </div>

@@ -6,7 +6,9 @@
 }
 
 .heading {
-    display: block;
+    top: 0;
+    padding-top: 20px;
+    text-align: center;
 }
 
 .inputContent {
@@ -55,5 +57,16 @@
 
 @keyframes blink {
     50% { border-color: #fcf6f5ff; }
+}
+
+.setOverflow {
+    height: 330px;
+    overflow-y: scroll;
+}
+
+.participantMessage {
+    position: absolute;
+    top: -50px;
+    right: 0;
 }
 

@@ -33,13 +33,13 @@
     text-align: center;
     margin-top: 0;
     margin-bottom: 0;
-    
 }
 
 .input-invoice-name {
     font-size: 40px;
     background-color: transparent;
     border: none;
+    font-weight: normal;
 }
 
 .invoice-input-form {
