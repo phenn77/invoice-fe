@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import './style.css';
-import axios from 'axios';
 
 class Participant extends Component {
     constructor(props) {
@@ -9,8 +8,9 @@ class Participant extends Component {
         this.state = {
             participantList: [],
             inputName: '',
+            displayInputMessage: 'block',
             errors: {
-                inputName: '',
+                message: '',
             }
         };
 
@@ -25,9 +25,14 @@ class Participant extends Component {
         if (name !== '') {
             this.setState({
                 inputName: name,
+                displayInputMessage: 'none',
+                errors: {
+                    message: ''
+                }
             })
         } else {
             this.setState({
+                displayInputMessage: 'block',
                 inputName: name,
             })
         }
@@ -36,73 +41,62 @@ class Participant extends Component {
     addParticipant(e) {
         e.preventDefault();
 
-        const url = 'http://localhost:7777/participants/create';
-        const {participantList} = this.state;
+        const {participantList, inputName} = this.state;
 
-        axios.post(url, {
-            name: this.state.inputName
-        }).then((response) => {
-            const data = response.data;
+        const newParticipantList = participantList;
 
-            // const {message} = data;
-            //
-            // if (message.length > 0) {
-            //     this.setState({
-            //         errors: {
-            //             inputName: message
-            //         }
-            //     });
-            //     return;
-            // }
+        if (inputName !== '') {
+            const status = newParticipantList.includes(inputName);
 
-            const newParticipantList = participantList;
-            newParticipantList.push(data);
-
-            this.setState({
-                inputName: '',
-                participantList: newParticipantList,
-            })
-        }).catch((error) => {
-            console.log(error);
+            if (status === true) {
+                this.setState({
+                    errors: {
+                        message: "Same name ? Nah you can't"
+                    }
+                })
+            } else {
+                newParticipantList.push(inputName);
+            }
+        } else {
             this.setState({
                 errors: {
-                    inputName: "Unexpected Error"
+                    message: 'Ohh come on, no name ??'
                 }
             })
+        }
+
+        this.setState({
+            inputName: '',
+            participantList: newParticipantList,
         });
+
+        this.props.data(newParticipantList);
     }
 
-    delParticipant(e, id) {
+    // delParticipant(e, id) {
+    delParticipant(e, index) {
         e.preventDefault();
 
-        const url = 'http://localhost:7777/participants/' + id + '/delete';
-        const self = this;
         const {participantList} = this.state;
 
-        axios.get(url)
-            .then(function (response) {
-                const newParticipantList = participantList.filter(participant => participant.id !== id);
+        const newParticipant = participantList;
+        newParticipant.splice(index, 1);
 
-                self.setState({
-                    participantList: newParticipantList
-                });
-            }).catch(function (error) {
-            console.log(error);
-            this.setState({
-                errors: {
-                    inputName: error
-                }
-            })
-        })
+        this.setState({
+            participantList: newParticipant
+        });
+
+        this.props.data(newParticipant);
     }
 
     render() {
-        const {participantList, inputName, errors} = this.state;
-        console.log(participantList.length);
+        const {participantList, inputName, errors, displayInputMessage} = this.state;
+
+        const isDisabled = participantList.length < 2;
 
         const {
             changePage, //to change page
-            data //send partipant list to invoice from app.js}
+            data //send participant list to invoice from app.js}
         } = this.props;
 
         const renderList = participantList.map((value, index) => {
@@ -112,13 +106,15 @@ class Participant extends Component {
                         {index + 1}
                     </td>
                     <td className="text-left">
-                        {value.name}
+                        {/*{value.name}*/}
+                        {value}
                     </td>
 
                     <td className="text-center">
                         <button
                             type="button"
-                            onClick={e => this.delParticipant(e, value.id)}
+                            // onClick={e => this.delParticipant(e, value.id)}
+                            onClick={e => this.delParticipant(e, index)}
                         >
                             Delete
                         </button>
@@ -136,16 +132,21 @@ class Participant extends Component {
                 <div className="participantContent">
                     <div className="inputContent">
                         <form onSubmit={this.addParticipant} className="inputForm" style={{position: 'relative'}}>
+                            <div className="inputMessage" style={{display: displayInputMessage}}>
+                                Kindly add the name please
+                            </div>
+
                             <input
                                 type="text"
                                 onChange={this.handleInputName}
                                 value={inputName}
                                 placeholder="Input Name"
+                                maxLength="15"
                             />
 
-                            {errors.inputName.length > 0 &&
+                            {errors.message.length > 0 &&
                             <div className="participantMessage">
-                                {errors.inputName}
+                                {errors.message}
                             </div>}
 
                             <button type="submit"> Add</button>
@@ -172,9 +173,7 @@ class Participant extends Component {
                                     changePage("invoice");
                                     data(participantList);
                                 }}
-                                style={{
-                                    disabled: participantList.length < 2 ? 'disabled' : null
-                                }}
+                                disabled={isDisabled}
                             >
                                 Done
                             </button>

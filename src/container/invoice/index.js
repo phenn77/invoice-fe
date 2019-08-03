@@ -1,14 +1,13 @@
 import React, {Component} from 'react';
 import './style.css';
 
-import axios from 'axios';
-
 class Invoice extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            participantList: [],
+            participantList: this.props.participantList,
+            participantChecked: [], //contain each participant data on each invoice detail by clicked checkbox
             invoiceName: '',
             inputInvoiceName: '',
             viewName: 'none', //to show h1 of invoice name
@@ -21,7 +20,13 @@ class Invoice extends Component {
             serviceCharge: 0,
             inputService: 0,
             grandTotal: 0,
-            eachAmount: []
+            eachAmount: [], //assign each price to each checkbox
+            eachTotal: {},
+            eachService: {},
+            eachTax: {},
+            eachGrandTotal: {},
+            highSpender: {},
+            highestAmount: 0
         };
 
         this.submitInvoiceName = this.submitInvoiceName.bind(this);
@@ -34,26 +39,12 @@ class Invoice extends Component {
         this.handleInputServiceCharge = this.handleInputServiceCharge.bind(this);
 
         this.resetData = this.resetData.bind(this);
+
+        this.inputChoice = this.inputChoice.bind(this);
     }
 
-    formatNumber (num) {
-        return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
-    }
-
-    componentDidMount() {
-        const url = 'http://localhost:7777/participants';
-
-        axios.get(url)
-            .then(response => {
-                const data = response.data;
-
-                this.setState({
-                    participantList: data
-                })
-            })
-            .catch(error => {
-                console.log(error);
-            })
+    formatNumber(num) {
+        return Number(num).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
     }
 
     handleInputInvoiceName(e) {
@@ -81,7 +72,7 @@ class Invoice extends Component {
     }
 
     handleInputServiceCharge(e) {
-        const servCharge = parseInt(e.target.value);
+        const servCharge = e.target.value;
         const totalPrice = this.state.total;
 
         const serviceChargeAmount = totalPrice * (servCharge / 100);
@@ -95,11 +86,14 @@ class Invoice extends Component {
         this.setState({
             serviceCharge: Math.round(serviceChargeAmount),
             tax: Math.round(taxAmount),
-            grandTotal: Math.round(grandTotal)
+            grandTotal: Math.round(grandTotal),
+            inputService: servCharge
+        }, () => {
+            this.setMustPay();
         })
     }
 
-    deleteDetail(index, price) {
+    deleteDetail(e, index, price) {
         const {details, total} = this.state;
 
         const newDetails = details;
@@ -108,6 +102,10 @@ class Invoice extends Component {
         this.setState({
             details: newDetails,
             total: total - price
+        }, () => {
+            if (newDetails.length === 0) {
+                this.resetData(e);
+            }
         });
     }
 
@@ -166,62 +164,137 @@ class Invoice extends Component {
             serviceCharge: 0,
             tax: 0,
             grandTotal: 0,
-            details: []
+            inputService: 0,
+            details: [],
+            eachAmount: [],
+            participantChecked: [],
+            eachTotal: {},
+            eachService: {},
+            eachTax: {},
+            eachGrandTotal: {}
         })
     }
 
+    //handle the checkbox to split price by each participant
+    inputChoice(e, name, price, participant, index, isDeleting) {
+
+        let {eachAmount, participantChecked} = this.state;
+
+        if (isDeleting) {
+            const idx = participantChecked[index].indexOf(participant);
+            participantChecked[index].splice(idx, 1);
+        } else {
+            if (typeof participantChecked[index] !== "object") {
+                participantChecked[index] = [];
+            }
+
+            participantChecked[index].push(participant);
+        }
+
+        eachAmount[index] = Math.round(price / (participantChecked[index].length || 1));
+
+
+        this.setState({
+            eachAmount,
+            participantChecked,
+
+        }, () => {
+            this.setMustPay();
+        });
+    };
+    //handle the checkbox to split price by each participant
+
+    //count all the participants amount
+    setMustPay = () => {
+        const {
+            eachAmount,
+            participantChecked,
+            inputService,
+            highSpender
+        } = this.state;
+
+        let eachTotal = {};
+        let eachService = {};
+        let eachTax = {};
+        let mustPay = {}; //Grand Total
+
+        participantChecked.map((value, index) => {
+            value = [...new Set(value)];
+
+            value.forEach((name) => {
+                if (mustPay[name] === undefined || eachTotal[name] === undefined ||
+                    eachService[name] === undefined || eachTax[name] === undefined) {
+                    mustPay[name] = 0;
+                    eachTotal[name] = 0;
+                    eachService[name] = 0;
+                    eachTax[name] = 0;
+                }
+
+                mustPay[name] = mustPay[name] + eachAmount[index]; //Grand Total
+
+                eachTotal[name] = eachTotal[name] + eachAmount[index];
+            });
+
+        });
+
+        if (inputService > 0) {
+            Object.keys(mustPay).forEach(name => {
+
+                //Each Service Amount
+                eachService[name] = eachTotal[name] * inputService / 100;
+                //Each Service Amount
+
+                //Each Tax Amount
+                eachTax[name] = (eachTotal[name] + eachService[name]) * 0.1;
+                //Each Tax Amount
+
+                //Grand Total
+                mustPay[name] = mustPay[name] + (mustPay[name] * inputService / 100);
+                mustPay[name] = mustPay[name] + (mustPay[name] * 0.1);
+                //Grand Total
+            });
+
+            //get the highest amount
+            const highestNum = Math.round(Math.max(...Object.values(mustPay)));
+
+            Object.entries(mustPay).forEach(
+                ([name, price]) => {
+                    name = [...new Set(name)];
+
+                    if(price === highestNum) {
+                        highSpender[price] = name;
+                    }
+                }
+            );
+        }
+
+        this.setState({
+            eachTotal,
+            eachService,
+            eachTax,
+            eachGrandTotal: mustPay
+        });
+    };
+    //count all the participants amount
+
     render() {
         const {
-            participantList, inputInvoiceName, inputName, inputPrice,
+            inputInvoiceName, inputName, inputPrice,
             details, total, serviceCharge, inputService, tax, grandTotal,
-            invoiceName, viewName, inputNameForm
+            invoiceName, viewName, inputNameForm,
+            eachService,
+            eachTax,
+            eachTotal,
+            eachGrandTotal
         } = this.state;
+
+        const {participantList} = this.props;
 
         const participantName = participantList.map((value) => {
             return (
-                <th>
-                    {value.name}
+                <th style={{width: 200}}>
+                    {value}
                 </th>
-            );
-        });
-
-        const participantInput = participantList.map((dt) => {
-            return (
-                <td>
-                    <form>
-                        <input
-                            type="checkbox"
-                            value={dt.id}
-                        />
-                    </form>
-                </td>
-            );
-        });
-
-        const detailsRender = details.map((value, index) => {
-            return (
-                <tr>
-                    <td className="text-center">
-                        {index + 1}
-                    </td>
-                    <td className="padLeft">
-                        {value.name}
-                    </td>
-                    <td className="text-right padRight number-spacing">
-                        {this.formatNumber(value.price)}
-                    </td>
-
-                    {participantInput}
-
-                    <td className="text-center">
-                        <button
-                            type="button"
-                            onClick={e => this.deleteDetail(index, value.price)}
-                        >
-                            Delete
-                        </button>
-                    </td>
-                </tr>
             );
         });
 
@@ -284,47 +357,115 @@ class Invoice extends Component {
                         </thead>
 
                         <tbody>
-                        {detailsRender}
+                        {details.map((value, index) => {
+                            return (
+                                <tr>
+                                    <td className="text-center">
+                                        {index + 1}
+                                    </td>
+                                    <td className="padLeft">
+                                        {value.name}
+                                    </td>
+                                    <td className="numberStyle">
+                                        {this.formatNumber(value.price)}
+                                    </td>
+
+                                    {
+                                        participantList.map((name) => {
+                                            const checked = (this.state.participantChecked[index] || []).indexOf(name) > -1;
+
+                                            return (
+                                                <td>
+                                                    <form>
+                                                        <input
+                                                            type="checkbox"
+                                                            onChange={e => this.inputChoice(e, value.name, value.price, name, index, checked)}
+                                                            checked={checked}
+                                                        />
+
+                                                        <span className="floatRight numberStyle">
+                                                        {checked ? this.formatNumber(Math.round(this.state.eachAmount[index])) : 0}
+                                                        </span>
+                                                    </form>
+                                                </td>
+                                            );
+                                        })
+                                    }
+
+                                    <td className="text-center">
+                                        <button
+                                            type="button"
+                                            onClick={e => this.deleteDetail(e, index, value.price)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
                         </tbody>
 
                         <tfoot>
                         <tr>
                             <td colSpan={2} className="padLeft">Total</td>
-                            <td className="text-right padRight number-spacing">{this.formatNumber(total)}</td>
+                            <td className="numberStyle">{this.formatNumber(total)}</td>
+                            {participantList.map(name => {
+                                return (
+                                    <td key={name} className="numberStyle">
+                                        {this.formatNumber(Math.round(eachTotal[name] || 0))}
+                                    </td>
+                                )
+                            })}
                         </tr>
                         <tr>
                             <td className="padLeft">Service</td>
                             <td className="text-right">
-                                <form>
-                                    <input
-                                        type="number"
-                                        onChange={this.handleInputServiceCharge}
-                                        value={inputService}
-                                        step="0.5"
-                                        min="0"
-                                        max="20"
-                                    />
-                                </form>
+                                <input
+                                    type="number"
+                                    onChange={this.handleInputServiceCharge}
+                                    value={inputService}
+                                    step="0.5"
+                                    min="0"
+                                    max="15"
+                                />
                             </td>
-                            <td className="text-right padRight number-spacing">{this.formatNumber(serviceCharge)}</td>
+                            <td className="numberStyle">{this.formatNumber(serviceCharge)}</td>
+                            {participantList.map(name => {
+                                return (
+                                    <td key={name} className="numberStyle">
+                                        {this.formatNumber(Math.round(eachService[name] || 0))}
+                                    </td>
+                                )
+                            })}
                         </tr>
                         <tr>
                             <td className="padLeft">Tax</td>
-                            <td className="text-right padRight number-spacing">10%</td>
-                            <td className="text-right padRight number-spacing">{this.formatNumber(tax)}</td>
+                            <td className="numberStyle">10%</td>
+                            <td className="numberStyle">{this.formatNumber(tax)}</td>
+                            {participantList.map(name => {
+                                return (
+                                    <td key={name} className="numberStyle">
+                                        {this.formatNumber(Math.round(eachTax[name] || 0))}
+                                    </td>
+                                )
+                            })}
                         </tr>
                         <tr>
                             <td colSpan={2} className="padLeft">Grand Total</td>
-                            <td className="text-right padRight number-spacing">{this.formatNumber(grandTotal)}</td>
+                            <td className="numberStyle">{this.formatNumber(grandTotal)}</td>
+                            {participantList.map(name => {
+                                return (
+                                    <td key={name} className="numberStyle">
+                                        {this.formatNumber(Math.round(eachGrandTotal[name] || 0))}
+                                    </td>
+                                )
+                            })}
                         </tr>
                         </tfoot>
                     </table>
                 </div>
 
                 <div className="text-center">
-                    <button>
-                        Save
-                    </button>
                     <button onClick={e => this.resetData(e)}>
                         Reset
                     </button>

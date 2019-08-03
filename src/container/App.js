@@ -11,7 +11,7 @@ class App extends Component {
 
         this.state = {
             currentPage: ['home'],
-            participantList: [],
+            participantList: ["a", "b", "c"],
         };
 
         this.changePage = this.changePage.bind(this);
@@ -36,7 +36,7 @@ class App extends Component {
 
         this.setState({
             participantList: list
-        })
+        });
     };
 
     render() {

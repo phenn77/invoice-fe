@@ -40,10 +40,18 @@
     background-color: transparent;
     border: none;
     font-weight: normal;
+    text-align: center;
 }
 
 .invoice-input-form {
     padding-top: 50px;
     padding-bottom: 40px;
     text-align: center;
+}
+
+@media (max-width: 1200px) {
+    .numberStyle {
+        padding-right: 5px;
+        padding-left: 5px;
+    }
 }

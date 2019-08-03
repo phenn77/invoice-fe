@@ -68,5 +68,26 @@
     position: absolute;
     top: -50px;
     right: 0;
+    font-size: 12px;
+}
+
+.inputMessage {
+    font-size: 12px;
+    position: absolute;
+    top: -50px;
+}
+
+.table-name-width {
+    width: 250px;
+}
+
+@media (max-width: 1200px) {
+    .inputContent {
+        margin-left: 40px;
+    }
+
+    .tableContent {
+        margin-right: 40px;
+    }
 }
 
