@@ -381,6 +381,7 @@ class Invoice extends Component {
                                                             type="checkbox"
                                                             onChange={e => this.inputChoice(e, value.name, value.price, name, index, checked)}
                                                             checked={checked}
+                                                            style={{float: 'left'}}
                                                         />
 
                                                         <span className="floatRight numberStyle">
